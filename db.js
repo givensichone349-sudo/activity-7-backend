@@ -13,14 +13,14 @@ function runSqlFile(fileName) {
 }
 
 async function initDatabase() {
-  const check = await pool.query("SELECT to_regclass('public.records') AS name");
+  await runSqlFile("schema.sql");
 
-  if (check.rows[0].name === null) {
-    await runSqlFile("schema.sql");
+  const count = await pool.query("SELECT COUNT(*)::int AS total FROM records");
+  if (count.rows[0].total === 0) {
     await runSqlFile("seed.sql");
-    console.log("Database table created and seeded.");
+    console.log("Database was empty, so starting records were added.");
   } else {
-    console.log("Database table already exists.");
+    console.log("Database already has records.");
   }
 }
 
